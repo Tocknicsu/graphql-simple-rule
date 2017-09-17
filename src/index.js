@@ -24,11 +24,11 @@ export default (config) => {
     key: uuid.v4(),
     expire: 60000
   })
-  cacheConfig.expire = typeof cacheConfig.expire === 'function' ? cacheConfig.expire(...resolverFuncArgs) : cacheConfig.expire
   return (func) => {
     // custom resolver or defaultFieldResolver
     const resolverFunc = func ? func : defaultFieldResolver
     return (...resolverFuncArgs) => {
+      cacheConfig.expire = typeof cacheConfig.expire === 'function' ? cacheConfig.expire(...resolverFuncArgs) : cacheConfig.expire
       let props = null
       // check enable cache or not
       if (cacheConfig.enable) {
