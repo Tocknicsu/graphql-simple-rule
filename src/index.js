@@ -5,6 +5,7 @@ import { Cache } from 'memory-cache'
 
 import _ from 'lodash'
 import uuid from 'uuid'
+import defaults from 'defaults'
 
 export default (config) => {
   // cache will following this rule
