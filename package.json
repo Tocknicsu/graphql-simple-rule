@@ -1,4 +1,6 @@
 {
+  "name": "graphql-simple-rule",
+  "version": "0.0.1",
   "scripts": {
     "build": "babel src --out-dir lib"
   },
