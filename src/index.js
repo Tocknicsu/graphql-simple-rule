@@ -44,6 +44,7 @@ export default (config) => {
       }
       // get config
       let rule
+      const info = resolverFuncArgs[3]
       if (info.fieldName in config.rules) {
          rule = config.rules[info.fieldName]
         if (typeof rule === 'boolean') {
