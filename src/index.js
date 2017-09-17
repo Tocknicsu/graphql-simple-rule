@@ -4,24 +4,39 @@ import {
 import { Cache } from 'memory-cache'
 
 import _ from 'lodash'
+import uuid from 'uuid'
 
 export default (config) => {
   // cache will following this rule
   const cache = new Cache()
+  config = defaults(config, {
+    props: {},
+    rules: {},
+    cache: {
+      enable: true,
+      key: uuid.v4(),
+      expire: 60000
+    }
+  })
+  let cacheConfig = defaults(config.cache, {
+    enable: true,
+    key: uuid.v4(),
+    expire: 60000
+  })
+  cacheConfig.expire = typeof cacheConfig.expire === 'function' ? cacheConfig.expire(...resolverFuncArgs) : cacheConfig.expire
   return (func) => {
     // custom resolver or defaultFieldResolver
     const resolverFunc = func ? func : defaultFieldResolver
     return (...resolverFuncArgs) => {
-      const [obj, args, context, info] = resolverFuncArgs
       let props = null
       // check enable cache or not
-      if (config.cache.enable) {
+      if (cacheConfig.enable) {
         // get the cache
-        const cacheKey = config.cache.key(...resolverFuncArgs)
+        const cacheKey = typeof cacheConfig.key === 'function' ? cacheConfig.key(...resolverFuncArgs) : cacheConfig.key
         props = cache.get(cacheKey)
         if (props === null) {
           props = _.mapValues(config.props, (func) => func(...resolverFuncArgs))
-          cache.put(cacheKey, props, config.cache.expire(...resolverFuncArgs))
+          cache.put(cacheKey, props, cacheConfig.expire)
         }
       } else {
         props = _.mapValues(config.props, (func) => func(...resolverFuncArgs))
