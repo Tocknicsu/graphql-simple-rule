@@ -7,10 +7,19 @@ import _ from 'lodash'
 import uuid from 'uuid'
 import defaults from 'defaults'
 
+const isPromise = (x) => {
+  return x != null && typeof x.then === 'function';
+}
 
-const funcWrapper = async (obj, args) => {
+const funcWrapper = (obj, args) => {
   if (typeof obj === 'function') {
-    return await obj(...args)
+    if (isPromise(obj)) {
+      obj(...args).then(res => {
+        return res
+      })
+    } else {
+      return obj(...args)
+    }
   }
   return obj
 }
