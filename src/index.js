@@ -43,6 +43,7 @@ export default (config) => {
         const cacheKey = await funcWrapper(cacheConfig.cacheKey, resolverFuncArgs)
         props = cache.get(cacheKey)
         if (props === null) {
+          props = {}
           for (let propsKey in config.props) {
             props[propsKey] = await funcWrapper(config.props[propsKey], resolverFuncArgs)
           }
