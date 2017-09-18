@@ -7,24 +7,14 @@ import _ from 'lodash'
 import uuid from 'uuid'
 import defaults from 'defaults'
 
-const isPromise = (x) => {
-  return x != null && typeof x.then === 'function';
-}
-
-const funcWrapper = (obj, args) => {
+const funcWrapper = async (obj, args) => {
   if (typeof obj === 'function') {
-    if (isPromise(obj)) {
-      obj(...args).then(res => {
-        return res
-      })
-    } else {
-      return obj(...args)
-    }
+    return await obj(...args)
   }
   return obj
 }
 
-export default (config) => {
+const Rules = (config) => {
   // cache will following this rule
   const cache = new Cache()
   config = defaults(config, {
@@ -44,20 +34,25 @@ export default (config) => {
   return (func) => {
     // custom resolver or defaultFieldResolver
     const resolverFunc = func ? func : defaultFieldResolver
-    return (...resolverFuncArgs) => {
-      cacheConfig.expire = funcWrapper(cacheConfig.expire, resolverFuncArgs)
+    return async (...resolverFuncArgs) => {
       let props = null
       // check enable cache or not
       if (cacheConfig.enable) {
+        cacheConfig.expire = await funcWrapper(cacheConfig.expire, resolverFuncArgs)
         // get the cache
-        const cacheKey = funcWrapper(cacheConfig.cacheKey, resolverFuncArgs)
+        const cacheKey = await funcWrapper(cacheConfig.cacheKey, resolverFuncArgs)
         props = cache.get(cacheKey)
         if (props === null) {
-          props = _.mapValues(config.props, func => funcWrapper(func, ...resolverFuncArgs))
+          for (let propsKey in config.props) {
+            props[propsKey] = await funcWrapper(config.props[propsKey], resolverFuncArgs)
+          }
           cache.put(cacheKey, props, cacheConfig.expire)
         }
       } else {
-        props = _.mapValues(config.props, func => funcWrapper(func, ...resolverFuncArgs))
+        props = {}
+        for (let propsKey in config.props) {
+          props[propsKey] = await funcWrapper(config.props[propsKey], resolverFuncArgs)
+        }
       }
       // get config
       let rule
@@ -66,7 +61,7 @@ export default (config) => {
          rule = config.rules[info.fieldName]
         if (typeof rule === 'boolean') {
         } else if (typeof rule === 'function') {
-          rule = rule(props)
+          rule = await funcWrapper(rule, [props])
         } else {
           rule = true
         }
