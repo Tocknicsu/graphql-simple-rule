@@ -7,6 +7,14 @@ import _ from 'lodash'
 import uuid from 'uuid'
 import defaults from 'defaults'
 
+
+const funcWrapper = async (obj, args) => {
+  if (typeof obj === 'function') {
+    return await obj(...args)
+  }
+  return obj
+}
+
 export default (config) => {
   // cache will following this rule
   const cache = new Cache()
@@ -28,19 +36,19 @@ export default (config) => {
     // custom resolver or defaultFieldResolver
     const resolverFunc = func ? func : defaultFieldResolver
     return (...resolverFuncArgs) => {
-      cacheConfig.expire = typeof cacheConfig.expire === 'function' ? cacheConfig.expire(...resolverFuncArgs) : cacheConfig.expire
+      cacheConfig.expire = funcWrapper(cacheConfig.expire, resolverFuncArgs)
       let props = null
       // check enable cache or not
       if (cacheConfig.enable) {
         // get the cache
-        const cacheKey = typeof cacheConfig.key === 'function' ? cacheConfig.key(...resolverFuncArgs) : cacheConfig.key
+        const cacheKey = funcWrapper(cacheConfig.cacheKey, resolverFuncArgs)
         props = cache.get(cacheKey)
         if (props === null) {
-          props = _.mapValues(config.props, (func) => func(...resolverFuncArgs))
+          props = _.mapValues(config.props, func => funcWrapper(func, ...resolverFuncArgs))
           cache.put(cacheKey, props, cacheConfig.expire)
         }
       } else {
-        props = _.mapValues(config.props, (func) => func(...resolverFuncArgs))
+        props = _.mapValues(config.props, func => funcWrapper(func, ...resolverFuncArgs))
       }
       // get config
       let rule
