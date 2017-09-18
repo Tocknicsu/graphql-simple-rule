@@ -14,7 +14,7 @@ const funcWrapper = async (obj, args) => {
   return obj
 }
 
-const Rules = (config) => {
+export default (config) => {
   // cache will following this rule
   const cache = new Cache()
   config = defaults(config, {
