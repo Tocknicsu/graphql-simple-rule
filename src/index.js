@@ -40,7 +40,7 @@ export default (config) => {
       if (cacheConfig.enable) {
         cacheConfig.expire = await funcWrapper(cacheConfig.expire, resolverFuncArgs)
         // get the cache
-        const cacheKey = await funcWrapper(cacheConfig.cacheKey, resolverFuncArgs)
+        const cacheKey = await funcWrapper(cacheConfig.key, resolverFuncArgs)
         props = cache.get(cacheKey)
         if (props === null) {
           props = {}
