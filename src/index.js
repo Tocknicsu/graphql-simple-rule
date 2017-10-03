@@ -52,7 +52,10 @@ export default (config) => {
           for (let propsKey in config.props) {
             props[propsKey] = await funcWrapper(config.props[propsKey], resolverFuncArgs)
           }
-          cachePool.put(cacheKey, props, cacheConfig.expire)
+          cachePool.put(cacheKey, {
+            done: true,
+            props
+          }, cacheConfig.expire)
         } else {
           await waitUntil(() => {
             cache = cachePool.get(cacheKey)
