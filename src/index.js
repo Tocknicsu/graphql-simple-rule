@@ -15,6 +15,15 @@ const funcWrapper = async (obj, args) => {
   return obj
 }
 
+export const RuleHelper = (rules, fields) => {
+  return _.mapValues(fields, (field) => {
+    return {
+      ...field,
+      resolve: rules(field.resolve)
+    }
+  })
+}
+
 export default (config) => {
   // cache will following this rule
   const cachePool = new Cache()
