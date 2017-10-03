@@ -1863,6 +1863,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+wait-until-promise@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/wait-until-promise/-/wait-until-promise-1.0.0.tgz#d37532d5b7eff6827020cb44d8ecaa233c9678c5"
+
 wide-align@^1.1.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/wide-align/-/wide-align-1.1.2.tgz#571e0f1b0604636ebc0dfc21b0339bbe31341710"

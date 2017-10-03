@@ -6,6 +6,7 @@ import { Cache } from 'memory-cache'
 import _ from 'lodash'
 import uuid from 'uuid'
 import defaults from 'defaults'
+import waitUntil from 'wait-until-promise'
 
 const funcWrapper = async (obj, args) => {
   if (typeof obj === 'function') {
@@ -16,7 +17,7 @@ const funcWrapper = async (obj, args) => {
 
 export default (config) => {
   // cache will following this rule
-  const cache = new Cache()
+  const cachePool = new Cache()
   config = defaults(config, {
     props: {},
     rules: {},
@@ -41,13 +42,23 @@ export default (config) => {
         cacheConfig.expire = await funcWrapper(cacheConfig.expire, resolverFuncArgs)
         // get the cache
         const cacheKey = await funcWrapper(cacheConfig.key, resolverFuncArgs)
-        props = cache.get(cacheKey)
-        if (props === null) {
+        cache = cachePool.get(cacheKey)
+        if (cache === null) {
+          cachePool.put(cacheKey, {
+            props: {},
+            done: false
+          })
           props = {}
           for (let propsKey in config.props) {
             props[propsKey] = await funcWrapper(config.props[propsKey], resolverFuncArgs)
           }
-          cache.put(cacheKey, props, cacheConfig.expire)
+          cachePool.put(cacheKey, props, cacheConfig.expire)
+        } else {
+          await waitUntil(() => {
+            cache = cachePool.get(cacheKey)
+            return cache.done
+          }, Infinity, 1)
+          props = cache.props  
         }
       } else {
         props = {}
