@@ -42,7 +42,7 @@ export default (config) => {
         cacheConfig.expire = await funcWrapper(cacheConfig.expire, resolverFuncArgs)
         // get the cache
         const cacheKey = await funcWrapper(cacheConfig.key, resolverFuncArgs)
-        cache = cachePool.get(cacheKey)
+        let cache = cachePool.get(cacheKey)
         if (cache === null) {
           cachePool.put(cacheKey, {
             props: {},
@@ -58,7 +58,7 @@ export default (config) => {
             cache = cachePool.get(cacheKey)
             return cache.done
           }, Infinity, 1)
-          props = cache.props  
+          props = cache.props
         }
       } else {
         props = {}
