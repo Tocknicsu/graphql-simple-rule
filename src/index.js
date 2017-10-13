@@ -69,7 +69,7 @@ export default (config) => {
           await waitUntil(() => {
             cache = cachePool.get(cacheKey)
             return cache.done
-          }, Infinity, 1)
+          }, cacheConfig.expire, 1)
           props = cache.props
         }
       } else {
