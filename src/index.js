@@ -34,6 +34,9 @@ export default (config) => {
       enable: true,
       key: uuid.v4(),
       expire: 60000
+    },
+    defaultRule: {
+      preRead: true
     }
   })
   let cacheConfig = defaults(config.cache, {
@@ -90,7 +93,7 @@ export default (config) => {
           rule = true
         }
       } else {
-        rule = true
+        rule = await funcWrapper(config.defaultRule.preRead, [props])
       }
       if (rule) {
         return resolverFunc(...resolverFuncArgs)
