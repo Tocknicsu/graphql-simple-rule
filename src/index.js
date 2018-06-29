@@ -30,7 +30,12 @@ export default config => {
     rules: {},
     cache: {
       enable: true,
-      key: () => uuid.v4(),
+      key: (obj, args, context, info) => {
+        if (!context._graphqlSimpleRuleCacheKey) {
+          context._graphqlSimpleRuleCacheKey = uuid.v4()
+        }
+        return context._graphqlSimpleRuleCacheKey
+      },
       expire: 60000,
     },
     defaultRule: {
