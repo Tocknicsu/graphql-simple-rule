@@ -30,7 +30,7 @@ export default config => {
     rules: {},
     cache: {
       enable: true,
-      key: uuid.v4(),
+      key: () => uuid.v4(),
       expire: 60000,
     },
     defaultRule: {
